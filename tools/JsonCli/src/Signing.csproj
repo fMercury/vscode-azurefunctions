@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFrameworks>netcoreapp2.0;netcoreapp3.0</TargetFrameworks>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="Microsoft.TemplateEngine.JsonCli.csproj" />
+        <PackageReference Include="MicroBuild.Core" Version="0.3.0" />
+        <PackageReference Include="MicroBuild.Core.Sentinel" Version="1.0.0" />
+        <PackageReference Include="MicroBuild.Plugins.Signing" Version="1.1.307" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <FilesToSign Include="$(OutDir)\Microsoft.TemplateEngine.JsonCli.dll">
+            <Authenticode>Microsoft400</Authenticode>
+            <StrongName>StrongName</StrongName>
+        </FilesToSign>
+    </ItemGroup>
+
+</Project>

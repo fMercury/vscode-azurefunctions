@@ -3,7 +3,8 @@ jobs:
   pool:
     name: VSEng-MicroBuildVS2019
   variables:
-    ProjectPath: 'tools/JsonCli/src/Microsoft.TemplateEngine.JsonCli.csproj'
+    SrcPath: 'tools/JsonCli/src'
+    ProjectPath: '$(SrcPath)/Microsoft.TemplateEngine.JsonCli.csproj'
     DropPath: '$(build.artifactstagingdirectory)/drop'
   steps:
   - task: ms-vseng.MicroBuildTasks.30666190-6959-11e5-9f96-f56098202fef.MicroBuildSigningPlugin@2
@@ -27,14 +28,14 @@ jobs:
     displayName: 'dotnet restore'
     inputs:
       command: restore
-      projects: '$(ProjectPath)'
+      projects: '$(SrcPath)/*.csproj'
       feedsToUse: config
-      nugetConfigPath: 'tools/JsonCli/src/nuget.config'
+      nugetConfigPath: '$(SrcPath)/nuget.config'
 
   - task: MSBuild@1
     displayName: 'build'
     inputs:
-      solution: '$(ProjectPath)'
+      solution: '$(SrcPath)/*.csproj'
       configuration: '$(BuildConfiguration)'
 
   - task: DotNetCoreCLI@2
