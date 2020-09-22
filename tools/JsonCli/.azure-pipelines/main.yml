@@ -3,8 +3,17 @@ jobs:
   pool:
     name: VSEng-MicroBuildVS2019
   variables:
-    ProjectPath: 'tools/JsonCli/src/Microsoft.TemplateEngine.JsonCli.csproj'
+    SrcPath: 'tools/JsonCli/src'
+    ProjectPath: '$(SrcPath)/Microsoft.TemplateEngine.JsonCli.csproj'
+    DropPath: '$(build.artifactstagingdirectory)/drop'
   steps:
+  - task: ms-vseng.MicroBuildTasks.30666190-6959-11e5-9f96-f56098202fef.MicroBuildSigningPlugin@2
+    displayName: 'Install Signing Plugin'
+    inputs:
+      signType: '$(SignType)'
+    env:
+      TeamName: 'AzureTools'
+
   - task: UseDotNet@2
     displayName: 'Use .NET Core sdk 2.0.x'
     inputs:
@@ -15,13 +24,26 @@ jobs:
     inputs:
       version: 3.0.x
 
+  - task: NuGetCommand@2
+    displayName: 'restore'
+    inputs:
+      restoreSolution: '$(ProjectPath)'
+      feedsToUse: config
+      nugetConfigPath: '$(SrcPath)/nuget.config'
+
+  - task: MSBuild@1
+    displayName: 'build'
+    inputs:
+      solution: '$(ProjectPath)'
+      configuration: '$(BuildConfiguration)'
+
   - task: DotNetCoreCLI@2
     displayName: 'dotnet publish 2.0'
     inputs:
       command: publish
       publishWebProjects: false
       projects: '$(ProjectPath)'
-      arguments: '--configuration $(BuildConfiguration) --framework netcoreapp2.0'
+      arguments: '--configuration $(BuildConfiguration) --framework netcoreapp2.0 --no-build'
       zipAfterPublish: false
       modifyOutputPath: false
 
@@ -31,22 +53,22 @@ jobs:
       command: publish
       publishWebProjects: false
       projects: '$(ProjectPath)'
-      arguments: '--configuration $(BuildConfiguration) --framework netcoreapp3.0'
+      arguments: '--configuration $(BuildConfiguration) --framework netcoreapp3.0 --no-build'
       zipAfterPublish: false
       modifyOutputPath: false
 
   - task: CopyFiles@2
-    displayName: 'Copy Files to: $(build.artifactstagingdirectory)'
+    displayName: 'Copy Files to Staging'
     inputs:
       SourceFolder: '$(system.defaultworkingdirectory)/tools/JsonCli/src/'
       Contents: 'bin/**/publish/**'
-      TargetFolder: '$(build.artifactstagingdirectory)'
+      TargetFolder: '$(DropPath)'
     condition: succeededOrFailed()
 
   - task: PublishBuildArtifacts@1
     displayName: 'Publish Artifact: drop'
     inputs:
-      PathtoPublish: '$(build.artifactstagingdirectory)'
+      PathtoPublish: '$(DropPath)'
     condition: succeededOrFailed()
 
   - template: compliance.yml
