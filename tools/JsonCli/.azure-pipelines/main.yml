@@ -26,11 +26,10 @@ jobs:
     inputs:
       version: 3.0.x
 
-  - task: DotNetCoreCLI@2
-    displayName: 'dotnet restore'
+  - task: NuGetCommand@2
+    displayName: 'restore'
     inputs:
-      command: restore
-      projects: '$(ProjectPath)'
+      restoreSolution: '$(ProjectPath)'
       feedsToUse: config
       nugetConfigPath: '$(SrcPath)/nuget.config'
 
@@ -40,11 +39,10 @@ jobs:
       solution: '$(ProjectPath)'
       configuration: '$(BuildConfiguration)'
 
-  - task: DotNetCoreCLI@2
-    displayName: 'dotnet restore signing project'
+  - task: NuGetCommand@2
+    displayName: 'restore signing project'
     inputs:
-      command: restore
-      projects: '$(SigningProjectPath)'
+      restoreSolution: '$(SigningProjectPath)'
       feedsToUse: config
       nugetConfigPath: '$(SigningPath)/nuget.config'
 
