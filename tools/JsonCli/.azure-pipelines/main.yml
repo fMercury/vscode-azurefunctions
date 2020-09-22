@@ -30,7 +30,7 @@ jobs:
     displayName: 'dotnet restore'
     inputs:
       command: restore
-      projects: '$(SrcPath)/*.csproj'
+      projects: '$(ProjectPath)'
       feedsToUse: config
       nugetConfigPath: '$(SrcPath)/nuget.config'
 
