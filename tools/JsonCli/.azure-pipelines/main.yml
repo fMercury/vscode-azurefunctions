@@ -5,6 +5,8 @@ jobs:
   variables:
     SrcPath: 'tools/JsonCli/src'
     ProjectPath: '$(SrcPath)/Microsoft.TemplateEngine.JsonCli.csproj'
+    SigningPath: 'tools/JsonCli/signing'
+    SigningProjectPath: '$(SigningPath)/Signing.csproj'
     DropPath: '$(build.artifactstagingdirectory)/drop'
   steps:
   - task: ms-vseng.MicroBuildTasks.30666190-6959-11e5-9f96-f56098202fef.MicroBuildSigningPlugin@2
@@ -35,7 +37,21 @@ jobs:
   - task: MSBuild@1
     displayName: 'build'
     inputs:
-      solution: '$(SrcPath)/*.csproj'
+      solution: '$(ProjectPath)'
+      configuration: '$(BuildConfiguration)'
+
+  - task: DotNetCoreCLI@2
+    displayName: 'dotnet restore signing project'
+    inputs:
+      command: restore
+      projects: '$(SigningProjectPath)'
+      feedsToUse: config
+      nugetConfigPath: '$(SigningPath)/nuget.config'
+
+  - task: MSBuild@1
+    displayName: 'build signing project'
+    inputs:
+      solution: '$(SigningProjectPath)'
       configuration: '$(BuildConfiguration)'
 
   - task: DotNetCoreCLI@2
